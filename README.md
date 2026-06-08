@@ -1,39 +1,115 @@
-# LmPdf
+# lm_pdf
 
-TODO: Delete this and the text below, and describe your gem
+## Contexto
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/lm_pdf`. To experiment with that code, run `bin/console` for an interactive prompt.
+`lm_pdf` es una gema Ruby (compatible con Rails 4.0.5) para generar HTML dinámico a partir de plantillas simples y datos tipo Hash.
 
-## Installation
+No utiliza ERB ni ejecuta código Ruby dentro de los templates. El sistema se basa en reemplazo directo de placeholders.
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
+---
 
-Install the gem and add to the application's Gemfile by executing:
+## Concepto
 
-```bash
-bundle add UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+El sistema se compone de 3 piezas:
+
+- **TemplateLoader** → registra y recupera templates
+- **Renderer** → reemplaza placeholders `[key]`
+- **API LmPdf** → punto de entrada público
+
+---
+
+## Cómo funciona
+
+### 1. Registro de template
+
+```ruby
+LmPdf::TemplateLoader.register(:invoice, "<h1>[name]</h1><p>[title]</p>")
 ```
 
-If bundler is not being used to manage dependencies, install the gem by executing:
+---
 
-```bash
-gem install UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+### 2. Carga de template
+
+```ruby
+template = LmPdf::TemplateLoader.load(:invoice)
 ```
 
-## Usage
+---
 
-TODO: Write usage instructions here
+### 3. Render
 
-## Development
+```ruby
+output = LmPdf.render(
+  template: template,
+  data: {
+    name: "ACME",
+    title: "Factura"
+  }
+)
+```
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+---
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+### 4. Resultado
 
-## Contributing
+```html
+<h1>ACME</h1><p>Factura</p>
+```
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/lm_pdf.
+---
 
-## License
+## API
 
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+### Registrar template
+
+```ruby
+LmPdf::TemplateLoader.register(name, template)
+```
+
+- `name`: Symbol o String
+- `template`: String HTML con placeholders `[key]`
+
+---
+
+### Cargar template
+
+```ruby
+LmPdf::TemplateLoader.load(name)
+```
+
+---
+
+### Renderizar
+
+```ruby
+LmPdf.render(template:, data: {})
+```
+
+---
+
+## Reglas
+
+- No ERB
+- No Ruby en templates
+- Reemplazo literal `[key]`
+
+---
+
+## Ejemplo completo
+
+```ruby
+LmPdf::TemplateLoader.register(:test, "<h1>[name]</h1>")
+
+template = LmPdf::TemplateLoader.load(:test)
+
+puts LmPdf.render(
+  template: template,
+  data: { name: "ACME" }
+)
+```
+
+---
+
+## Arquitectura
+
+Rails App → TemplateLoader → Renderer → HTML final
