@@ -48,6 +48,16 @@ output = LmPdf.render(
 )
 ```
 
+```ruby
+output = LmPdf.load_render(
+  :invoice,
+  data: {
+    name: "ACME",
+    title: "Factura"
+  }
+)
+```
+
 ---
 
 ### 4. Resultado
@@ -83,6 +93,10 @@ LmPdf::TemplateLoader.load(name)
 
 ```ruby
 LmPdf.render(template:, data: {})
+```
+
+```ruby
+LmPdf.render(name, data: {})
 ```
 
 ---

@@ -6,8 +6,15 @@ module LmPdf
       @templates[name.to_sym] = template
     end
 
+    class TemplateNotFound < StandardError; end
+
     def self.load(name)
-      @templates[name.to_sym]
+      key = name.to_sym
+      template = @templates[key]
+
+      raise TemplateNotFound, "Template not found: #{key}" unless template
+      
+      template
     end
   end
 end
