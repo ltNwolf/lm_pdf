@@ -9,9 +9,7 @@ module LmPdf
 
   def self.load_render(template_key, data: {})
     template = LmPdf::TemplateLoader.load(template_key)
-  rescue KeyError, LoadError => e
-    raise TemplateNotFoundError, "Template '#{template_key}' not found: #{e.message}"
-  else
+
     Renderer.new(template).render(data)
   end
 end
