@@ -4,6 +4,6 @@ require_relative "lm_pdf/version"
 
 module LmPdf
   def self.hello
-    "AAAAAAAAAAAAAAAAA"
+    "ok"
   end
 end
